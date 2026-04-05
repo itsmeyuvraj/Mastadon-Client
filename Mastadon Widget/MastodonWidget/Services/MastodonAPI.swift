@@ -22,11 +22,11 @@ enum APIError: LocalizedError {
 
 // MARK: - Mastodon API Service
 
-final class MastodonAPI {
+final class MastodonAPI: Sendable {
     static let shared = MastodonAPI()
     private init() {}
 
-    private var decoder: JSONDecoder = {
+    private let decoder: JSONDecoder = {
         let d = JSONDecoder()
         d.keyDecodingStrategy = .useDefaultKeys
         return d
