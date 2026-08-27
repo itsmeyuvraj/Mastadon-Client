@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Account
 
-struct Account: Codable, Identifiable {
+struct Account: Codable, Identifiable, Sendable {
     let id: String
     let username: String
     let acct: String
@@ -25,14 +25,14 @@ struct Account: Codable, Identifiable {
 
 // MARK: - MediaAttachment
 
-struct MediaAttachment: Codable, Identifiable {
+struct MediaAttachment: Codable, Identifiable, Sendable {
     let id: String
     let type: MediaType
     let url: String?
     let previewUrl: String?
     let description: String?
 
-    enum MediaType: String, Codable {
+    enum MediaType: String, Codable, Sendable {
         case image, gifv, video, audio, unknown
     }
 
@@ -44,7 +44,7 @@ struct MediaAttachment: Codable, Identifiable {
 
 // MARK: - Status
 
-struct Status: Codable, Identifiable {
+struct Status: Codable, Identifiable, Sendable {
     let id: String
     let createdAt: String
     let content: String
@@ -61,7 +61,7 @@ struct Status: Codable, Identifiable {
     var favourited: Bool?
     var reblogged: Bool?
 
-    enum Visibility: String, Codable {
+    enum Visibility: String, Codable, Sendable {
         case `public`, unlisted, `private`, direct
     }
 
@@ -97,7 +97,7 @@ struct Status: Codable, Identifiable {
 }
 
 // Wrapper to avoid recursive Codable issues
-final class Box<T: Codable>: Codable {
+final class Box<T: Codable & Sendable>: Codable, @unchecked Sendable {
     let value: T
     init(_ value: T) { self.value = value }
     required init(from decoder: Decoder) throws {
@@ -112,7 +112,7 @@ final class Box<T: Codable>: Codable {
 
 // MARK: - App Registration Response
 
-struct AppRegistration: Codable {
+struct AppRegistration: Codable, Sendable {
     let id: String
     let clientId: String
     let clientSecret: String
@@ -126,7 +126,7 @@ struct AppRegistration: Codable {
 
 // MARK: - Token Response
 
-struct TokenResponse: Codable {
+struct TokenResponse: Codable, Sendable {
     let accessToken: String
     let tokenType: String
     let scope: String
@@ -140,8 +140,8 @@ struct TokenResponse: Codable {
 
 // MARK: - Streaming Event
 
-struct StreamingEvent {
-    enum EventType: String {
+struct StreamingEvent: Sendable {
+    enum EventType: String, Sendable {
         case update, delete, notification, filters_changed, announcement
     }
     let type: EventType
@@ -150,7 +150,7 @@ struct StreamingEvent {
 
 // MARK: - Media Upload Response
 
-struct MediaUploadResponse: Codable {
+struct MediaUploadResponse: Codable, Sendable {
     let id: String
     let type: String
     let url: String?

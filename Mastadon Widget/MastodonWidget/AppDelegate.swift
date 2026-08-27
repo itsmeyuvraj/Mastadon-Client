@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - App Delegate (Menu Bar Setup)
 
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
@@ -17,7 +18,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Menu Bar
 
-    @MainActor private func setupMenuBar() {
+    private func setupMenuBar() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
         if let button = statusItem?.button {
@@ -34,7 +35,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setupEventMonitor()
     }
 
-    @MainActor private func setupPopover() {
+    private func setupPopover() {
         let popover = NSPopover()
         popover.contentSize = NSSize(width: 400, height: 600)
         popover.behavior = .transient
@@ -63,7 +64,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             preferredEdge: .minY
         )
         eventMonitor?.start()
-        NSApp.activate(ignoringOtherApps: true)
+        NSApp.activate()
     }
 
     private func closePopover() {
@@ -75,15 +76,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func setupEventMonitor() {
         eventMonitor = EventMonitor(mask: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
-            guard let self, self.popover?.isShown == true else { return }
-            self.closePopover()
+            Task { @MainActor in
+                guard let self, self.popover?.isShown == true else { return }
+                self.closePopover()
+            }
         }
     }
 }
 
 // MARK: - Event Monitor Helper
 
-final class EventMonitor {
+final class EventMonitor: @unchecked Sendable {
     private let mask: NSEvent.EventTypeMask
     private let handler: (NSEvent?) -> Void
     private var monitor: Any?

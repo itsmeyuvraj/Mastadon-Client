@@ -253,10 +253,7 @@ final class AuthManager: NSObject, ObservableObject {
 // MARK: - ASWebAuthenticationPresentationContextProviding
 
 extension AuthManager: ASWebAuthenticationPresentationContextProviding {
-    // ASWebAuthenticationSession always calls this on the main thread.
-    nonisolated func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        MainActor.assumeIsolated {
-            NSApp.keyWindow ?? NSWindow()
-        }
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        NSApp.keyWindow ?? NSWindow()
     }
 }

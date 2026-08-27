@@ -354,16 +354,12 @@ struct ComposeView: View {
                     replyToId: replyTo?.id
                 )
 
-                await MainActor.run {
-                    onPost?(posted)
-                    dismiss()
-                }
+                onPost?(posted)
+                dismiss()
             } catch {
-                await MainActor.run {
-                    errorMessage = error.localizedDescription
-                    isPosting = false
-                    isUploadingImages = false
-                }
+                errorMessage = error.localizedDescription
+                isPosting = false
+                isUploadingImages = false
             }
         }
     }
@@ -395,6 +391,6 @@ extension NSImage {
     func jpegData(compressionQuality: CGFloat) -> Data? {
         guard let tiff = tiffRepresentation,
               let bitmap = NSBitmapImageRep(data: tiff) else { return nil }
-        return bitmap.representation(using: .jpeg, properties: [.compressionFactor: compressionQuality])
+        return bitmap.representation(using: .jpeg, properties: [.compressionFactor: compressionQuality as NSNumber])
     }
 }
